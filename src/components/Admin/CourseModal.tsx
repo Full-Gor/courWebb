@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, BookOpen } from 'lucide-react';
 
-interface Module {
+interface Onglet {
   id: string;
   name: string;
   files: number;
@@ -9,46 +9,47 @@ interface Module {
   description?: string;
 }
 
-interface ModuleModalProps {
+interface OngletModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (module: Module) => void;
-  module?: Module | null;
+  onSave: (onglet: Onglet) => void;
+  onglet?: Onglet | null;
 }
 
-const ModuleModal: React.FC<ModuleModalProps> = ({ isOpen, onClose, onSave, module }) => {
+const OngletModal: React.FC<OngletModalProps> = ({ isOpen, onClose, onSave, onglet }) => {
+  console.log('🔵 OngletModal render:', { isOpen, onglet });
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [files, setFiles] = useState(0);
   const [content, setContent] = useState(0);
 
   useEffect(() => {
-    if (module) {
-      setName(module.name);
-      setDescription(module.description || '');
-      setFiles(module.files);
-      setContent(module.content);
+    if (onglet) {
+      setName(onglet.name);
+      setDescription(onglet.description || '');
+      setFiles(onglet.files);
+      setContent(onglet.content);
     } else {
       setName('');
       setDescription('');
       setFiles(0);
       setContent(0);
     }
-  }, [module]);
+  }, [onglet]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (name.trim()) {
-      const newModule: Module = {
-        id: module?.id || `module-${Date.now()}`,
+      const newOnglet: Onglet = {
+        id: onglet?.id || `onglet-${Date.now()}`,
         name: name.trim(),
         description: description.trim(),
         files,
         content
       };
       
-      onSave(newModule);
+      onSave(newOnglet);
       onClose();
     }
   };
@@ -62,7 +63,7 @@ const ModuleModal: React.FC<ModuleModalProps> = ({ isOpen, onClose, onSave, modu
           <div className="flex items-center gap-3">
             <BookOpen size={24} className="text-green-600" />
                          <h3 className="text-lg font-bold text-gray-800">
-               {module ? 'Modifier le module' : 'Nouveau module'}
+               {onglet ? 'Modifier l\'onglet' : 'Nouvel onglet'}
              </h3>
           </div>
           <button
@@ -76,14 +77,14 @@ const ModuleModal: React.FC<ModuleModalProps> = ({ isOpen, onClose, onSave, modu
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                      <div>
              <label className="block text-sm font-medium text-gray-700 mb-2">
-               Nom du module *
+               Nom de l'onglet *
              </label>
              <input
                type="text"
                value={name}
                onChange={(e) => setName(e.target.value)}
                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-               placeholder="Nom du module"
+               placeholder="Nom de l'onglet"
                required
              />
            </div>
@@ -97,7 +98,7 @@ const ModuleModal: React.FC<ModuleModalProps> = ({ isOpen, onClose, onSave, modu
                onChange={(e) => setDescription(e.target.value)}
                rows={3}
                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-               placeholder="Description du module"
+               placeholder="Description de l'onglet"
              />
            </div>
 
@@ -141,8 +142,8 @@ const ModuleModal: React.FC<ModuleModalProps> = ({ isOpen, onClose, onSave, modu
               type="submit"
               className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
             >
-              <Save size={16} />
-              {course ? 'Modifier' : 'Créer'}
+                             <Save size={16} />
+               {onglet ? 'Modifier' : 'Créer'}
             </button>
           </div>
         </form>
@@ -151,4 +152,4 @@ const ModuleModal: React.FC<ModuleModalProps> = ({ isOpen, onClose, onSave, modu
   );
 };
 
-export default ModuleModal; 
+export default OngletModal; 

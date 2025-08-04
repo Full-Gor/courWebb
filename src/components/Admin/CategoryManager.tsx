@@ -47,31 +47,37 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({ onClose, onSave, init
   const handleCategorySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Soumission catégorie:', { categoryName, categoryDescription, selectedCategory });
-    if (categoryName.trim() && categoryDescription.trim()) {
-      if (selectedCategory) {
-        // Modifier la catégorie existante
-        setCategories(prev => prev.map(cat =>
-          cat.id === selectedCategory.id
-            ? { ...cat, name: categoryName, description: categoryDescription }
-            : cat
-        ));
-      } else {
-        // Créer une nouvelle catégorie
-        const newCategory: Category = {
-          id: `category-${Date.now()}`,
-          name: categoryName,
-          description: categoryDescription,
-          mediaFiles: [],
-          textContent: [],
-          createdDate: new Date().toISOString().split('T')[0]
-        };
-        setCategories(prev => [...prev, newCategory]);
-      }
-      setShowCategoryModal(false);
-      setSelectedCategory(null);
-      setCategoryName('');
-      setCategoryDescription('');
+    
+    // Pour la création, on exige les deux champs
+    if (!selectedCategory && (!categoryName.trim() || !categoryDescription.trim())) {
+      alert('Veuillez remplir tous les champs pour créer une nouvelle catégorie.');
+      return;
     }
+    
+    // Pour la modification, on permet des champs vides
+    if (selectedCategory) {
+      // Modifier la catégorie existante
+      setCategories(prev => prev.map(cat =>
+        cat.id === selectedCategory.id
+          ? { ...cat, name: categoryName.trim() || cat.name, description: categoryDescription.trim() || cat.description }
+          : cat
+      ));
+    } else {
+      // Créer une nouvelle catégorie
+      const newCategory: Category = {
+        id: `category-${Date.now()}`,
+        name: categoryName,
+        description: categoryDescription,
+        mediaFiles: [],
+        textContent: [],
+        createdDate: new Date().toISOString().split('T')[0]
+      };
+      setCategories(prev => [...prev, newCategory]);
+    }
+    setShowCategoryModal(false);
+    setSelectedCategory(null);
+    setCategoryName('');
+    setCategoryDescription('');
   };
 
   const handleFileUpload = (categoryId: string, e: React.ChangeEvent<HTMLInputElement>) => {

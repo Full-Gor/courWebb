@@ -62,8 +62,8 @@ function App() {
   const getSectionSubtitle = () => {
     if (currentSection === 'accueil') return 'Bienvenue sur notre plateforme d\'apprentissage';
     if (currentSection === 'contact') return 'Contactez-nous pour toute question';
-    if (currentCourse) return 'Explorez les catégories et contenus disponibles';
-    return 'Gérez les catégories et contenus de cette section';
+    if (currentCourse) return '';
+    return '';
   };
 
   const handleSectionChange = (section: string) => {
@@ -110,20 +110,20 @@ function App() {
 
     // Sections génériques
     const sectionDescriptions: Record<string, string> = {
-      'cours-audio': 'Gérez vos cours audio avec différentes catégories et contenus multimédias',
-      'conferences': 'Organisez vos conférences par catégories avec supports audio, vidéo et documents',
-      'preches': 'Classifiez vos prêches et sermons avec du contenu multimédia',
-      'articles': 'Gérez vos articles et textes religieux par catégories',
-      'fatawas': 'Organisez les fatawas et avis religieux avec des catégories thématiques',
-      'videos': 'Gérez votre contenu vidéo avec des catégories organisées',
-      'telechargements': 'Organisez vos fichiers téléchargeables par catégories'
+      'cours-audio': '',
+      'conferences': '',
+      'preches': '',
+      'articles': '',
+      'fatawas': '',
+      'videos': '',
+      'telechargements': ''
     };
 
     return (
       <GenericSection
         sectionId={currentSection}
         sectionName={getSectionTitle()}
-        description={sectionDescriptions[currentSection] || 'Gérez le contenu de cette section'}
+        description={sectionDescriptions[currentSection] || ''}
         isAdmin={isAdmin}
       />
     );

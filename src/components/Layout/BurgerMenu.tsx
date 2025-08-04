@@ -58,7 +58,7 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ currentSection, onSectionChange
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 p-3 bg-islamic-primary text-white rounded-full shadow-lg hover:bg-islamic-dark transition-colors"
+        className="fixed top-4 right-4 z-50 p-3 bg-islamic-primary text-white rounded-full shadow-lg hover:bg-islamic-dark transition-colors"
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
@@ -66,7 +66,7 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ currentSection, onSectionChange
       <div className={`fixed inset-0 z-40 transition-opacity duration-300 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
         <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setIsOpen(false)} />
         
-        <div className={`absolute left-0 top-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className={`absolute right-0 top-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="p-6 bg-islamic-primary text-white">
             <h2 className="text-xl font-bold">Cours Islamiques</h2>
             <p className="text-islamic-light text-sm mt-1">Navigation</p>

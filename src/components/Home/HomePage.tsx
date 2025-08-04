@@ -76,24 +76,7 @@ const HomePage: React.FC<HomePageProps> = ({ onCourseChange }) => {
         })}
       </div>
 
-      <div className="bg-islamic-light rounded-xl p-8 text-center">
-        <h2 className="text-2xl font-bold text-islamic-dark mb-4">
-          Explorez nos autres sections
-        </h2>
-        <p className="text-gray-700 mb-6">
-          Découvrez également nos conférences, prêches, articles, fatawas et bien plus encore.
-        </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          {['Conférences', 'Prêches', 'Articles', 'Fatawas', 'Vidéos'].map((item) => (
-            <span
-              key={item}
-              className="px-4 py-2 bg-white text-islamic-primary rounded-full text-sm font-medium shadow-sm"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-      </div>
+
     </div>
   );
 };

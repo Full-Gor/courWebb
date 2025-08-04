@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Settings, 
-  Users, 
   FileText, 
-  Headphones, 
   Video, 
   Download, 
   BookOpen, 
@@ -13,15 +11,14 @@ import {
   Trash2, 
   LogOut,
   ArrowLeft,
-  Eye,
-  EyeOff,
   FolderOpen
 } from 'lucide-react';
 import { mockSections } from '../../data/mockData';
 import { Category } from '../../types';
 import CategoryManager from './CategoryManager';
-import ModuleModal from './CourseModal';
+import OngletModal from './CourseModal';
 import CategoryModal from './CategoryModal';
+import OngletFileManager from './OngletFileManager';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -29,36 +26,36 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onBackToSite }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'sections' | 'courses' | 'content' | 'users'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'sections' | 'courses'>('overview');
   const [sections, setSections] = useState(mockSections);
-  const [showPassword, setShowPassword] = useState(false);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [selectedSectionCategories, setSelectedSectionCategories] = useState<Category[]>([]);
-  const [showModuleModal, setShowModuleModal] = useState(false);
-  const [selectedModule, setSelectedModule] = useState<any>(null);
+  const [showOngletModal, setShowOngletModal] = useState(false);
+  const [selectedOnglet, setSelectedOnglet] = useState<any>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [showOngletFileManager, setShowOngletFileManager] = useState(false);
+  const [selectedOngletForFiles, setSelectedOngletForFiles] = useState<any>(null);
+  const [ongletFiles, setOngletFiles] = useState<any[]>([]);
 
   const mainSections = [
-    { id: 'tawhid', name: 'Tawhid', icon: BookOpen, count: 3 },
-    { id: 'min-haj', name: 'Min Haj (Méthodologie)', icon: FileText, count: 3 },
-    { id: 'terrorisme', name: 'Réfutation du Terrorisme', icon: Headphones, count: 2 }
+    { id: 'tawhid', name: 'Tawhid', icon: BookOpen, count: 3, description: 'Fondamentaux de l\'unicité divine' },
+    { id: 'min-haj', name: 'Min Haj (Méthodologie)', icon: FileText, count: 3, description: 'Méthodologie islamique' },
+    { id: 'terrorisme', name: 'Réfutation du Terrorisme', icon: BookOpen, count: 2, description: 'Réfutation des idéologies extrémistes' },
+    { id: 'sectes', name: 'Sectes', icon: BookOpen, count: 4, description: 'Étude des sectes et déviations' },
+    { id: 'tafsir', name: 'Tafsir Coran', icon: FileText, count: 6, description: 'Exégèse du Coran' },
+    { id: 'hadith', name: 'Charh Ahadith', icon: BookOpen, count: 5, description: 'Explication des hadiths' }
   ];
 
-  const courses = [
-    { id: 'tawhid', name: 'Tawhid', categories: 4, content: 12 },
-    { id: 'min-haj', name: 'Min Haj', categories: 3, content: 8 },
-    { id: 'sectes', name: 'Sectes', categories: 5, content: 15 },
-    { id: 'terrorisme', name: 'Terrorisme', categories: 2, content: 6 },
-    { id: 'tafsir-coran', name: 'Tafsir Coran', categories: 6, content: 20 },
-    { id: 'charh-ahadith', name: 'Charh Ahadith', categories: 4, content: 10 },
-    { id: 'biographie-prophetes', name: 'Biographie des Prophètes', categories: 3, content: 8 },
-    { id: 'biographie-savants', name: 'Biographie des Savants', categories: 4, content: 12 },
-    { id: 'rappels', name: 'Rappels', categories: 2, content: 5 },
-    { id: 'exhortations', name: 'Exhortations', categories: 3, content: 7 },
-    { id: 'mise-en-garde', name: 'Mise en Garde', categories: 2, content: 4 },
-    { id: 'divers', name: 'Divers', categories: 1, content: 3 }
-  ];
+  const [onglets, setOnglets] = useState([
+    { id: 'conferences', name: 'Conférences', files: 15, content: 25, description: 'Conférences islamiques' },
+    { id: 'preches', name: 'Prêches', files: 8, content: 12, description: 'Prêches du vendredi' },
+    { id: 'cours-audio', name: 'Cours Audio', files: 20, content: 35, description: 'Cours islamiques audio' },
+    { id: 'articles', name: 'Articles', files: 12, content: 18, description: 'Articles islamiques' },
+    { id: 'fatawas', name: 'Fatawas', files: 10, content: 15, description: 'Fatawas et avis juridiques' },
+    { id: 'videos', name: 'Vidéos', files: 25, content: 40, description: 'Vidéos islamiques' },
+    { id: 'telechargements', name: 'Téléchargements', files: 30, content: 50, description: 'Fichiers à télécharger' }
+  ]);
 
   const handleDeleteSection = (sectionId: string) => {
     if (confirm(`Êtes-vous sûr de vouloir supprimer la section "${sectionId}" ?`)) {
@@ -70,14 +67,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onBackToSite 
   const handleEditSection = (sectionId: string) => {
     const section = mainSections.find(s => s.id === sectionId);
     if (section) {
-      setSelectedCategory(section);
-      setShowCategoryModal(true);
+      console.log('Modification du cours:', section);
+      // TODO: Ouvrir une modal pour modifier les informations du cours
+      alert(`🔄 Modification du cours "${section.name}" - Fonctionnalité à implémenter`);
     }
   };
 
   const handleAddSection = () => {
-    setSelectedCategory(null);
-    setShowCategoryModal(true);
+    console.log('Ajout d\'un nouveau cours');
+    // TODO: Ouvrir une modal pour créer un nouveau cours
+    alert(`🔄 Ajout d'un nouveau cours - Fonctionnalité à implémenter`);
   };
 
   const handleSaveCategory = (category: any) => {
@@ -86,30 +85,62 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onBackToSite 
     alert(`✅ Catégorie "${category.name}" ${category.id ? 'modifiée' : 'créée'} avec succès !`);
   };
 
-  const handleDeleteCourse = (courseId: string) => {
-    if (confirm(`Êtes-vous sûr de vouloir supprimer le cours "${courseId}" ?`)) {
+  const handleDeleteCourse = (ongletId: string) => {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer l'onglet "${ongletId}" ?`)) {
       // Logique de suppression
-      console.log(`Suppression du cours: ${courseId}`);
+      console.log(`Suppression de l'onglet: ${ongletId}`);
     }
   };
 
-  const handleEditCourse = (courseId: string) => {
-    const course = courses.find(c => c.id === courseId);
-    if (course) {
-      setSelectedModule(course);
-      setShowModuleModal(true);
+  const handleEditCourse = (ongletId: string) => {
+    console.log('🔵 Bouton Modifier onglet cliqué pour ID:', ongletId);
+    const onglet = onglets.find(o => o.id === ongletId);
+    if (onglet) {
+      console.log('🔵 Onglet trouvé:', onglet);
+      setSelectedOnglet(onglet);
+      setShowOngletModal(true);
+      console.log('🔵 Modal ouverte pour modification');
+    } else {
+      console.log('❌ Onglet non trouvé pour ID:', ongletId);
     }
   };
 
   const handleAddCourse = () => {
-    setSelectedModule(null);
-    setShowModuleModal(true);
+    setSelectedOnglet(null);
+    setShowOngletModal(true);
   };
 
-  const handleSaveModule = (module: any) => {
-    console.log('Module sauvegardé:', module);
+  const handleSaveOnglet = (onglet: any) => {
+    console.log('Onglet sauvegardé:', onglet);
+    
+    if (onglet.id && onglet.id.startsWith('onglet-')) {
+      // Nouvel onglet
+      setOnglets(prev => [...prev, onglet]);
+    } else {
+      // Modification d'un onglet existant
+      setOnglets(prev => prev.map(o => 
+        o.id === onglet.id ? onglet : o
+      ));
+    }
+    
     // TODO: Intégrer avec Supabase plus tard
-    alert(`✅ Module "${module.name}" ${module.id ? 'modifié' : 'créé'} avec succès !`);
+    alert(`✅ Onglet "${onglet.name}" ${onglet.id && !onglet.id.startsWith('onglet-') ? 'modifié' : 'créé'} avec succès !`);
+  };
+
+  const handleManageFiles = (ongletId: string) => {
+    const onglet = onglets.find(o => o.id === ongletId);
+    if (onglet) {
+      setSelectedOngletForFiles(onglet);
+      // TODO: Charger les fichiers depuis Supabase
+      setOngletFiles([]); // Pour l'instant, on commence avec une liste vide
+      setShowOngletFileManager(true);
+    }
+  };
+
+  const handleSaveFiles = (files: any[]) => {
+    console.log('Fichiers sauvegardés:', files);
+    // TODO: Intégrer avec Supabase plus tard
+    alert(`✅ ${files.length} fichier(s) sauvegardé(s) pour "${selectedOngletForFiles?.name}" !`);
   };
 
   const handleManageCategories = (sectionId: string) => {
@@ -140,7 +171,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onBackToSite 
 
   const renderOverview = () => (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="bg-white p-6 rounded-lg shadow border">
           <div className="flex items-center justify-between">
             <div>
@@ -177,17 +208,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onBackToSite 
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Utilisateurs</p>
-              <p className="text-2xl font-bold text-gray-800">1,234</p>
-            </div>
-            <div className="p-3 bg-orange-100 rounded-full">
-              <Users className="text-orange-600" size={24} />
-            </div>
-          </div>
-        </div>
+        
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -206,21 +227,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onBackToSite 
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Cours Populaires</h3>
-          <div className="space-y-3">
-            {courses.slice(0, 5).map((course) => (
-              <div key={course.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="font-medium text-gray-700">{course.name}</span>
-                <div className="flex gap-2 text-sm text-gray-500">
-                  <span>{course.categories} catégories</span>
-                  <span>•</span>
-                  <span>{course.content} contenus</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+                 <div className="bg-white p-6 rounded-lg shadow border">
+           <h3 className="text-lg font-semibold text-gray-800 mb-4">Onglets Populaires</h3>
+           <div className="space-y-3">
+             {onglets.slice(0, 5).map((onglet) => (
+               <div key={onglet.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                 <span className="font-medium text-gray-700">{onglet.name}</span>
+                 <div className="flex gap-2 text-sm text-gray-500">
+                   <span>{onglet.files} fichiers</span>
+                   <span>•</span>
+                   <span>{onglet.content} contenus</span>
+                 </div>
+               </div>
+             ))}
+           </div>
+         </div>
       </div>
     </div>
   );
@@ -270,7 +291,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onBackToSite 
                </div>
              </div>
              <div className="space-y-2">
-               <p className="text-sm text-gray-600">{section.count} modules</p>
+               <p className="text-sm text-gray-600">{section.description}</p>
+               <p className="text-sm text-gray-600">{section.count} catégories</p>
                <div className="w-full bg-gray-200 rounded-full h-2">
                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${(section.count / 30) * 100}%` }}></div>
                </div>
@@ -281,153 +303,67 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onBackToSite 
     </div>
   );
 
-  const renderCourses = () => (
+    const renderCourses = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-800">Gestion des Modules</h3>
+        <h3 className="text-lg font-semibold text-gray-800">Gestion des Onglets</h3>
         <button 
           onClick={handleAddCourse}
           className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
         >
           <Plus size={18} />
-          Nouveau Module
+          Nouvel Onglet
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow border overflow-hidden">
-        <table className="w-full">
-                     <thead className="bg-gray-50">
-             <tr>
-               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Module</th>
-               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fichiers</th>
-               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contenus</th>
-               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-             </tr>
-           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {courses.map((course) => (
-              <tr key={course.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">{course.name}</div>
-                  <div className="text-sm text-gray-500">ID: {course.id}</div>
-                </td>
-                                 <td className="px-6 py-4 whitespace-nowrap">
-                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                     {course.categories} fichiers
-                   </span>
-                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{course.content}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => handleEditCourse(course.id)}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      Modifier
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteCourse(course.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Supprimer
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {onglets.map((onglet) => (
+          <div key={onglet.id} className="bg-white p-6 rounded-lg shadow border">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <BookOpen size={24} className="text-gray-600" />
+                <h4 className="font-semibold text-gray-800">{onglet.name}</h4>
+              </div>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => handleManageFiles(onglet.id)}
+                  className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                  title="Gérer les fichiers"
+                >
+                  <FolderOpen size={16} />
+                </button>
+                <button 
+                  onClick={() => handleEditCourse(onglet.id)}
+                  className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  title="Modifier l'onglet"
+                >
+                  <Edit size={16} />
+                </button>
+                <button 
+                  onClick={() => handleDeleteCourse(onglet.id)}
+                  className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Supprimer l'onglet"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">{onglet.description}</p>
+              <p className="text-sm text-gray-600">{onglet.files} fichiers</p>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-green-600 h-2 rounded-full" style={{ width: `${(onglet.files / 50) * 100}%` }}></div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 
-  const handleAddContent = () => {
-    console.log('Ajout d\'un nouveau contenu');
-    // TODO: Ouvrir modal d'ajout
-  };
 
-  const renderContent = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-800">Gestion du Contenu</h3>
-        <div className="flex gap-2">
-          <button 
-            onClick={handleAddContent}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-          >
-            <Plus size={18} />
-            Nouveau Contenu
-          </button>
-        </div>
-      </div>
 
-      <div className="bg-white p-6 rounded-lg shadow border">
-        <p className="text-gray-600 mb-4">
-          Gérez tous les contenus de votre plateforme : fichiers audio, vidéos, articles, etc.
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 border rounded-lg">
-            <h4 className="font-semibold text-gray-800 mb-2">Fichiers Audio</h4>
-            <p className="text-sm text-gray-600">45 fichiers</p>
-          </div>
-          <div className="p-4 border rounded-lg">
-            <h4 className="font-semibold text-gray-800 mb-2">Vidéos</h4>
-            <p className="text-sm text-gray-600">23 vidéos</p>
-          </div>
-          <div className="p-4 border rounded-lg">
-            <h4 className="font-semibold text-gray-800 mb-2">Documents</h4>
-            <p className="text-sm text-gray-600">67 documents</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
-  const handleAddUser = () => {
-    console.log('Ajout d\'un nouvel utilisateur');
-    // TODO: Ouvrir modal d'ajout
-  };
-
-  const renderUsers = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-800">Gestion des Utilisateurs</h3>
-        <button 
-          onClick={handleAddUser}
-          className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-        >
-          <Plus size={18} />
-          Nouvel Utilisateur
-        </button>
-      </div>
-
-      <div className="bg-white p-6 rounded-lg shadow border">
-        <p className="text-gray-600 mb-4">
-          Surveillez l'activité des utilisateurs et gérez les accès.
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 border rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">1,234</div>
-            <div className="text-sm text-gray-600">Utilisateurs totaux</div>
-          </div>
-          <div className="text-center p-4 border rounded-lg">
-            <div className="text-2xl font-bold text-green-600">892</div>
-            <div className="text-sm text-gray-600">Utilisateurs actifs</div>
-          </div>
-          <div className="text-center p-4 border rounded-lg">
-            <div className="text-2xl font-bold text-orange-600">156</div>
-            <div className="text-sm text-gray-600">Nouveaux ce mois</div>
-          </div>
-          <div className="text-center p-4 border rounded-lg">
-            <div className="text-2xl font-bold text-purple-600">45</div>
-            <div className="text-sm text-gray-600">En ligne</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -447,22 +383,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onBackToSite 
               <h1 className="text-xl font-bold text-gray-800">Dashboard Administrateur</h1>
             </div>
             
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowPassword(!showPassword)}
-                className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                {showPassword ? 'Masquer' : 'Afficher'} les mots de passe
-              </button>
-              <button
-                onClick={onLogout}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                <LogOut size={18} />
-                Déconnexion
-              </button>
-            </div>
+                         <div className="flex items-center gap-4">
+               <button
+                 onClick={onLogout}
+                 className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+               >
+                 <LogOut size={18} />
+                 Déconnexion
+               </button>
+             </div>
           </div>
         </div>
       </header>
@@ -473,10 +402,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onBackToSite 
           <div className="flex space-x-8">
                          {[
                { id: 'overview', name: 'Vue d\'ensemble', icon: Settings },
-               { id: 'sections', name: 'Cours', icon: FileText },
-               { id: 'courses', name: 'Catégories', icon: BookOpen },
-               { id: 'content', name: 'Contenu', icon: Headphones },
-               { id: 'users', name: 'Utilisateurs', icon: Users }
+               { id: 'courses', name: 'Onglets', icon: BookOpen },
+               { id: 'sections', name: 'Cours', icon: FileText }
              ].map((tab) => {
               const Icon = tab.icon;
               return (
@@ -500,11 +427,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onBackToSite 
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'overview' && renderOverview()}
-        {activeTab === 'sections' && renderSections()}
-        {activeTab === 'courses' && renderCourses()}
-        {activeTab === 'content' && renderContent()}
-        {activeTab === 'users' && renderUsers()}
+                 {activeTab === 'overview' && renderOverview()}
+         {activeTab === 'sections' && renderSections()}
+         {activeTab === 'courses' && renderCourses()}
       </main>
 
              {/* CategoryManager Modal */}
@@ -516,29 +441,42 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onBackToSite 
          />
        )}
 
-       {/* ModuleModal */}
-       <ModuleModal
-         isOpen={showModuleModal}
+       {/* OngletModal */}
+       <OngletModal
+         isOpen={showOngletModal}
          onClose={() => {
-           setShowModuleModal(false);
-           setSelectedModule(null);
+           setShowOngletModal(false);
+           setSelectedOnglet(null);
          }}
-         onSave={handleSaveModule}
-         module={selectedModule}
+         onSave={handleSaveOnglet}
+         onglet={selectedOnglet}
        />
 
-       {/* CategoryModal */}
-       <CategoryModal
-         isOpen={showCategoryModal}
-         onClose={() => {
-           setShowCategoryModal(false);
-           setSelectedCategory(null);
-         }}
-         onSave={handleSaveCategory}
-         category={selectedCategory}
-       />
-     </div>
-   );
- };
+               {/* CategoryModal */}
+        <CategoryModal
+          isOpen={showCategoryModal}
+          onClose={() => {
+            setShowCategoryModal(false);
+            setSelectedCategory(null);
+          }}
+          onSave={handleSaveCategory}
+          category={selectedCategory}
+        />
+
+                 {/* OngletFileManager */}
+         <OngletFileManager
+           isOpen={showOngletFileManager}
+           onClose={() => {
+             setShowOngletFileManager(false);
+             setSelectedOngletForFiles(null);
+             setOngletFiles([]);
+           }}
+           onSave={handleSaveFiles}
+           ongletName={selectedOngletForFiles?.name || ''}
+           initialFiles={ongletFiles}
+         />
+      </div>
+    );
+  };
 
 export default AdminDashboard; 

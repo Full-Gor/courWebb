@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Send, Mail, User, MessageCircle } from 'lucide-react';
-import emailjs from '@emailjs/browser';
+import { supabase } from '../../lib/supabase';
 
 const ContactForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -25,22 +25,26 @@ const ContactForm: React.FC = () => {
     setSubmitStatus('idle');
 
     try {
-      // Configuration EmailJS (remplacez par vos propres clés)
-      await emailjs.send(
-        'YOUR_SERVICE_ID', // Remplacez par votre Service ID
-        'YOUR_TEMPLATE_ID', // Remplacez par votre Template ID
-        {
-          from_name: formData.name,
-          from_email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-          to_email: 'votre-email@example.com' // Remplacez par votre email
-        },
-        'YOUR_PUBLIC_KEY' // Remplacez par votre clé publique
-      );
+      // Insérer le message de contact dans Supabase
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            subject: formData.subject,
+            message: formData.message,
+            created_at: new Date().toISOString()
+          }
+        ]);
 
-      setSubmitStatus('success');
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      if (error) {
+        console.error('Erreur Supabase:', error);
+        setSubmitStatus('error');
+      } else {
+        setSubmitStatus('success');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      }
     } catch (error) {
       console.error('Erreur lors de l\'envoi:', error);
       setSubmitStatus('error');

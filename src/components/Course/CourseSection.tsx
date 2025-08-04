@@ -67,9 +67,6 @@ const CourseSection: React.FC<CourseSectionProps> = ({
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">{courseName}</h1>
-          <p className="text-gray-600 mt-2">
-            Gérez les catégories et le contenu de cette section
-          </p>
         </div>
         {isAdmin && (
           <div className="flex gap-3">
