@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Upload, FileText, Plus, Edit, Trash2 } from 'lucide-react';
+import { X, Upload, FileText, Plus, Edit, Trash2, Play } from 'lucide-react';
 import { MediaFile, TextContent } from '../../types';
+import MediaPlayer from '../MediaPlayer';
 
 interface AdminPanelProps {
   categoryId: string;
@@ -13,6 +14,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ categoryId, onClose }) => {
   const [selectedContent, setSelectedContent] = useState<TextContent | null>(null);
   const [textTitle, setTextTitle] = useState('');
   const [textContent, setTextContent] = useState('');
+  const [selectedFile, setSelectedFile] = useState<MediaFile | null>(null);
 
   // Données de démonstration - dans une vraie app, cela viendrait du contexte/state global
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([
@@ -20,7 +22,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ categoryId, onClose }) => {
       id: 'file-1',
       name: 'Introduction au Tawhid.mp3',
       type: 'mp3',
-      url: '#',
+      url: '/media/introduction-au-tawhid.mp3',
       size: '15.2 MB',
       duration: '45:32',
       uploadDate: '2024-01-15'
@@ -101,6 +103,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ categoryId, onClose }) => {
     }
   };
 
+  const handlePlayFile = (file: MediaFile) => {
+    setSelectedFile(file);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-hidden">
@@ -169,12 +175,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ categoryId, onClose }) => {
                         <span>Ajouté: {new Date(file.uploadDate).toLocaleDateString('fr-FR')}</span>
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleDeleteFile(file.id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handlePlayFile(file)}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Lire le fichier"
+                      >
+                        <Play size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteFile(file.id)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Supprimer le fichier"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                 ))}
 
@@ -307,6 +323,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ categoryId, onClose }) => {
             </form>
           </div>
         </div>
+      )}
+
+      {selectedFile && (
+        <MediaPlayer
+          file={selectedFile}
+          onClose={() => setSelectedFile(null)}
+        />
       )}
     </div>
   );

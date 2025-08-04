@@ -5,13 +5,26 @@ import HomePage from './components/Home/HomePage';
 import CourseSection from './components/Course/CourseSection';
 import ContactForm from './components/Contact/ContactForm';
 import GenericSection from './components/Section/GenericSection';
+import AdminAuth from './components/Admin/AdminAuth';
+import AdminDashboard from './components/Admin/AdminDashboard';
 import { mockSections } from './data/mockData';
 import { Category } from './types';
+import { useAdminAccess } from './hooks/useAdminAccess';
 
 function App() {
   const [currentSection, setCurrentSection] = useState('accueil');
   const [currentCourse, setCurrentCourse] = useState('');
   const [sections, setSections] = useState(mockSections);
+  
+  // Hook pour l'accès admin
+  const {
+    isAdmin,
+    showAuth,
+    activateAdminMode,
+    deactivateAdminMode,
+    hideAuthModal,
+    authenticate
+  } = useAdminAccess();
 
   const getSectionTitle = () => {
     if (currentSection === 'accueil') return 'Accueil';
@@ -90,6 +103,7 @@ function App() {
           courseName={getSectionTitle()}
           categories={sectionData?.categories || []}
           onCategoriesUpdate={(categories) => handleCategoriesUpdate(currentCourse, categories)}
+          isAdmin={isAdmin}
         />
       );
     }
@@ -110,9 +124,20 @@ function App() {
         sectionId={currentSection}
         sectionName={getSectionTitle()}
         description={sectionDescriptions[currentSection] || 'Gérez le contenu de cette section'}
+        isAdmin={isAdmin}
       />
     );
   };
+
+  // Si on est en mode admin, afficher le dashboard
+  if (isAdmin) {
+    return (
+      <AdminDashboard
+        onLogout={deactivateAdminMode}
+        onBackToSite={deactivateAdminMode}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -130,6 +155,14 @@ function App() {
       <main className="pt-4">
         {renderContent()}
       </main>
+
+      {/* Modal d'authentification admin */}
+      {showAuth && (
+        <AdminAuth
+          onAuthSuccess={activateAdminMode}
+          onClose={hideAuthModal}
+        />
+      )}
     </div>
   );
 }

@@ -6,9 +6,10 @@ interface CategoryCardProps {
   category: Category;
   onEdit: () => void;
   onDelete: () => void;
+  isAdmin?: boolean;
 }
 
-const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete }) => {
+const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete, isAdmin = false }) => {
   const getFileIcon = (type: string) => {
     switch (type) {
       case 'mp3':
@@ -29,20 +30,22 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onEdit, onDelete 
     <div className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6">
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-xl font-bold text-gray-800">{category.name}</h3>
-        <div className="flex gap-2">
-          <button
-            onClick={onEdit}
-            className="p-2 text-gray-600 hover:text-islamic-primary hover:bg-islamic-light rounded-lg transition-colors"
-          >
-            <Edit size={18} />
-          </button>
-          <button
-            onClick={onDelete}
-            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-          >
-            <Trash2 size={18} />
-          </button>
-        </div>
+        {isAdmin && (
+          <div className="flex gap-2">
+            <button
+              onClick={onEdit}
+              className="p-2 text-gray-600 hover:text-islamic-primary hover:bg-islamic-light rounded-lg transition-colors"
+            >
+              <Edit size={18} />
+            </button>
+            <button
+              onClick={onDelete}
+              className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <Trash2 size={18} />
+            </button>
+          </div>
+        )}
       </div>
 
       <p className="text-gray-600 mb-4 text-sm">{category.description}</p>

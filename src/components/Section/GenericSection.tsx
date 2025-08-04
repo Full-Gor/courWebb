@@ -9,12 +9,14 @@ interface GenericSectionProps {
   sectionId: string;
   sectionName: string;
   description: string;
+  isAdmin?: boolean;
 }
 
 const GenericSection: React.FC<GenericSectionProps> = ({
   sectionId,
   sectionName,
-  description
+  description,
+  isAdmin = false
 }) => {
   const [categories, setCategories] = useState<Category[]>([
     {
@@ -88,22 +90,24 @@ const GenericSection: React.FC<GenericSectionProps> = ({
           <h1 className="text-3xl font-bold text-gray-800">{sectionName}</h1>
           <p className="text-gray-600 mt-2">{description}</p>
         </div>
-        <div className="flex gap-3">
-          <button
-            onClick={() => setShowAdminPanel(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            <Settings size={20} />
-            Admin
-          </button>
-          <button
-            onClick={handleAddCategory}
-            className="flex items-center gap-2 px-4 py-2 bg-islamic-primary text-white rounded-lg hover:bg-islamic-dark transition-colors"
-          >
-            <Plus size={20} />
-            Nouvelle Catégorie
-          </button>
-        </div>
+        {isAdmin && (
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowAdminPanel(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              <Settings size={20} />
+              Admin
+            </button>
+            <button
+              onClick={handleAddCategory}
+              className="flex items-center gap-2 px-4 py-2 bg-islamic-primary text-white rounded-lg hover:bg-islamic-dark transition-colors"
+            >
+              <Plus size={20} />
+              Nouvelle Catégorie
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -113,6 +117,7 @@ const GenericSection: React.FC<GenericSectionProps> = ({
             category={category}
             onEdit={() => handleEditCategory(category)}
             onDelete={() => handleDeleteCategory(category.id)}
+            isAdmin={isAdmin}
           />
         ))}
       </div>
