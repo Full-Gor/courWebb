@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { securityService } from '../lib/security';
 
 interface UseAdminAccessReturn {
   isAdmin: boolean;
@@ -15,44 +16,35 @@ export const useAdminAccess = (): UseAdminAccessReturn => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [keySequence, setKeySequence] = useState<string[]>([]);
-  
-  const ADMIN_PASSWORD = 'admin123';
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Ignorer si on est déjà en mode admin
       if (isAdmin) return;
 
-      // Log pour déboguer
-      console.log('Touche pressée:', event.code, 'Ctrl:', event.ctrlKey, 'Alt:', event.altKey);
-
       // Vérifier si Ctrl + Alt + Q sont pressés simultanément
       if (event.ctrlKey && event.altKey && event.code === 'KeyQ') {
         console.log('🔐 Séquence secrète détectée !');
         setShowAuth(true);
-        event.preventDefault(); // Empêcher le comportement par défaut
+        event.preventDefault();
       }
     };
 
-    // Ajouter l'écouteur d'événements
     document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isAdmin]);
 
   const activateAdminMode = () => {
     setIsAdmin(true);
     setShowAuth(false);
-    // Stocker en sessionStorage pour persister pendant la session
-    sessionStorage.setItem('isAdmin', 'true');
+    securityService.activateAdmin();
+    securityService.logAccessAttempt(true);
   };
 
   const deactivateAdminMode = () => {
     setIsAdmin(false);
     setShowAuth(false);
-    sessionStorage.removeItem('isAdmin');
+    securityService.deactivateAdmin();
   };
 
   const showAuthModal = () => {
@@ -64,17 +56,20 @@ export const useAdminAccess = (): UseAdminAccessReturn => {
   };
 
   const authenticate = (password: string): boolean => {
-    if (password === ADMIN_PASSWORD) {
+    const success = securityService.authenticate(password);
+    securityService.logAccessAttempt(success);
+    
+    if (success) {
       activateAdminMode();
-      return true;
     }
-    return false;
+    
+    return success;
   };
 
-  // Vérifier si on était déjà admin au chargement
+  // Vérifier la session au chargement
   useEffect(() => {
-    const wasAdmin = sessionStorage.getItem('isAdmin') === 'true';
-    if (wasAdmin) {
+    const isAdminSession = securityService.isAdmin() && securityService.checkSessionExpiration();
+    if (isAdminSession) {
       setIsAdmin(true);
     }
   }, []);

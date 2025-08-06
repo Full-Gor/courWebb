@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Send, Mail, User, MessageCircle } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { validateContactForm } from '../../lib/validation';
 
 const ContactForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -24,27 +24,28 @@ const ContactForm: React.FC = () => {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    try {
-      // Insérer le message de contact dans Supabase
-      const { data, error } = await supabase
-        .from('contact_messages')
-        .insert([
-          {
-            name: formData.name,
-            email: formData.email,
-            subject: formData.subject,
-            message: formData.message,
-            created_at: new Date().toISOString()
-          }
-        ]);
+    // Validation des données
+    const validation = validateContactForm(formData);
+    
+    if (!validation.isValid) {
+      setSubmitStatus('error');
+      alert(`Erreurs de validation:\n${validation.errors.join('\n')}`);
+      setIsSubmitting(false);
+      return;
+    }
 
-      if (error) {
-        console.error('Erreur Supabase:', error);
-        setSubmitStatus('error');
-      } else {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', subject: '', message: '' });
-      }
+    try {
+      // Utiliser les données sanitizées
+      const sanitizedData = validation.sanitizedData!;
+      
+      // Simulation d'envoi (en attendant Supabase)
+      console.log('📧 Message de contact:', sanitizedData);
+      
+      // Simuler un délai d'envoi
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
       console.error('Erreur lors de l\'envoi:', error);
       setSubmitStatus('error');
